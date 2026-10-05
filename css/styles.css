@@ -7,256 +7,848 @@
   --accent-1: #6366f1;
   --accent-2: #22d3ee;
   --header-h: 56px;
-
-  /* Fondo detrás del diagrama (por si el SVG es transparente).
-     Si tu diagrama se ve mejor sobre oscuro, probá con #111827 */
   --diagram-bg: #0b0f1a;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+/* =========================================
+   RESET
+   ========================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html,
+body {
+  width: 100%;
   height: 100%;
+
   background: var(--bg);
   color: var(--text);
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  font-family:
+    "Inter",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+
   overflow: hidden;
 }
+
 
 body {
   display: flex;
   flex-direction: column;
 }
 
-/* ---------- Encabezado ---------- */
+
+/* =========================================
+   HEADER
+   ========================================= */
+
 .topbar {
+  position: relative;
+
   height: var(--header-h);
   flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 20px;
-  background: rgba(11, 15, 26, 0.9);
-  border-bottom: 1px solid var(--border);
+
+  background:
+    rgba(11, 15, 26, 0.9);
+
+  border-bottom:
+    1px solid var(--border);
+
   backdrop-filter: blur(10px);
+
   z-index: 10;
 }
 
-.brand { display: flex; align-items: center; gap: 12px; }
+
+/* =========================================
+   BRAND
+   ========================================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 260px;
+}
+
 
 .logo {
   width: 14px;
   height: 14px;
+
   border-radius: 5px;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  box-shadow: 0 0 14px rgba(99, 102, 241, 0.7);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent-1),
+      var(--accent-2)
+    );
+
+  box-shadow:
+    0 0 14px
+    rgba(99, 102, 241, 0.7);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.brand h1 { font-size: 1rem; font-weight: 600; letter-spacing: 0.2px; }
+
+.logo:hover {
+  transform:
+    rotate(8deg)
+    scale(1.1);
+
+  box-shadow:
+    0 0 20px
+    rgba(99, 102, 241, 0.9);
+}
+
+
+.brand h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
 
 .badge {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 1px;
+
   padding: 3px 9px;
+
   border-radius: 999px;
+
   color: var(--accent-2);
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  background: rgba(34, 211, 238, 0.08);
+
+  border:
+    1px solid
+    rgba(34, 211, 238, 0.4);
+
+  background:
+    rgba(34, 211, 238, 0.08);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.hint { font-size: 0.8rem; color: var(--muted); }
 
-/* ---------- Visor ---------- */
+.badge:hover {
+  background:
+    rgba(34, 211, 238, 0.14);
+
+  border-color:
+    rgba(34, 211, 238, 0.65);
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =========================================
+   HINT
+   ========================================= */
+
+.hint {
+  min-width: 260px;
+
+  text-align: right;
+
+  font-size: 0.8rem;
+
+  color: var(--muted);
+}
+
+
+/* =========================================
+   SELECTOR
+   ========================================= */
+
+.diagram-selector {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 4px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: 9px;
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+
+.diagram-selector:hover {
+  border-color:
+    rgba(99, 102, 241, 0.25);
+
+  box-shadow:
+    0 5px 25px
+    rgba(0, 0, 0, 0.25);
+}
+
+
+.diagram-option {
+  position: relative;
+
+  border: none;
+
+  border-radius: 6px;
+
+  padding: 7px 13px;
+
+  background: transparent;
+
+  color: var(--muted);
+
+  font-family: inherit;
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+.diagram-option:hover {
+  color: var(--text);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  transform:
+    translateY(-1px);
+}
+
+
+.diagram-option:active {
+  transform:
+    translateY(0)
+    scale(0.96);
+}
+
+
+.diagram-option.active {
+  color: #fff;
+
+  background:
+    rgba(99, 102, 241, 0.25);
+
+  box-shadow:
+    0 0 12px
+    rgba(99, 102, 241, 0.10);
+}
+
+
+/* Línea animada debajo del botón */
+
+.diagram-option.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 2px;
+
+  width: 18px;
+  height: 2px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius: 999px;
+
+  background:
+    var(--accent-2);
+
+  opacity: 0.8;
+
+  animation:
+    selectorLine 0.25s ease;
+}
+
+
+@keyframes selectorLine {
+  from {
+    width: 4px;
+    opacity: 0;
+  }
+
+  to {
+    width: 18px;
+    opacity: 0.8;
+  }
+}
+
+
+/* =========================================
+   VISOR
+   ========================================= */
+
 .viewer {
   position: relative;
+
   flex: 1;
+
   overflow: hidden;
+
   cursor: grab;
+
   touch-action: none;
+
   user-select: none;
-  background-color: var(--bg);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.2px, transparent 1.2px);
-  background-size: 28px 28px;
+
+  background-color:
+    var(--bg);
+
+  background-image:
+    radial-gradient(
+      rgba(255, 255, 255, 0.07)
+      1.2px,
+      transparent 1.2px
+    );
+
+  background-size:
+    28px 28px;
 }
 
-.viewer.dragging { cursor: grabbing; }
 
-/* Importante: sin "will-change", así el navegador vuelve a dibujar el SVG
-   nítido en cada nivel de zoom */
+.viewer.dragging {
+  cursor: grabbing;
+}
+
+
+/* =========================================
+   STAGE
+   ========================================= */
+
 .stage {
   position: absolute;
+
   top: 0;
   left: 0;
-  transform-origin: 0 0;
+
+  transform-origin:
+    0 0;
+
+  /*
+   * NO usamos:
+   *
+   * will-change: transform;
+   * backface-visibility;
+   * translate3d;
+   *
+   * porque pueden provocar que Chrome
+   * rasterice el SVG y se vea pixelado.
+   */
+
+  opacity: 1;
+
+  transition:
+    opacity 0.22s ease;
 }
 
-.stage.smooth { transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); }
+
+/*
+ * Animación para cambiar de diagrama.
+ *
+ * Importante:
+ * solamente animamos opacity.
+ * No tocamos transform.
+ */
+
+.stage.diagram-changing {
+  opacity: 0;
+}
+
+
+/*
+ * Animación de zoom / botón fit.
+ */
+
+.stage.smooth {
+  transition:
+    transform 0.28s cubic-bezier(
+      0.22,
+      0.61,
+      0.36,
+      1
+    ),
+    opacity 0.22s ease;
+}
+
+
+/* =========================================
+   SVG / IMAGEN
+   ========================================= */
 
 .stage img {
   display: block;
+
   width: 100%;
   height: 100%;
+
   border-radius: 10px;
-  background: var(--diagram-bg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+
+  background:
+    var(--diagram-bg);
+
+  box-shadow:
+    0 20px 60px
+    rgba(0, 0, 0, 0.6),
+
+    0 0 0 1px
+    var(--border);
+
   pointer-events: none;
+
+  /*
+   * Dejamos el renderizado normal del navegador.
+   * No usamos image-rendering: pixelated.
+   */
 }
 
-/* ---------- Mensaje de error ---------- */
+
+/* =========================================
+   ERROR
+   ========================================= */
+
 .error-msg {
   position: absolute;
+
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+
+  transform:
+    translate(-50%, -50%);
+
   max-width: 420px;
+
   padding: 22px 26px;
+
   text-align: center;
+
   line-height: 1.6;
+
   font-size: 0.95rem;
+
   color: var(--text);
-  background: var(--panel);
-  border: 1px solid rgba(248, 113, 113, 0.5);
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid
+    rgba(248, 113, 113, 0.5);
+
   border-radius: 16px;
-  backdrop-filter: blur(14px);
+
+  backdrop-filter:
+    blur(14px);
 }
 
-.error-msg[hidden] { display: none; }
 
-/* ---------- Barra de zoom ---------- */
+.error-msg[hidden] {
+  display: none;
+}
+
+
+/* =========================================
+   ZOOM BAR
+   ========================================= */
+
 .zoombar {
   position: absolute;
+
   left: 50%;
   bottom: 22px;
-  transform: translateX(-50%);
+
+  transform:
+    translateX(-50%);
+
   display: flex;
   align-items: center;
+
   gap: 10px;
+
   padding: 10px 14px;
-  background: var(--panel);
-  border: 1px solid var(--border);
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid var(--border);
+
   border-radius: 999px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  backdrop-filter:
+    blur(14px);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.45);
+
   cursor: default;
 }
+
+
+/* =========================================
+   BOTONES
+   ========================================= */
 
 .icon-btn {
   width: 32px;
   height: 32px;
+
   display: grid;
   place-items: center;
+
   border: none;
+
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
   color: var(--text);
+
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
-.icon-btn:hover { background: rgba(99, 102, 241, 0.35); }
-.icon-btn:active { transform: scale(0.92); }
+
+.icon-btn:hover {
+  background:
+    rgba(99, 102, 241, 0.35);
+
+  box-shadow:
+    0 0 12px
+    rgba(99, 102, 241, 0.18);
+
+  transform:
+    scale(1.08);
+}
+
+
+.icon-btn:active {
+  transform:
+    scale(0.9);
+}
+
 
 .icon-btn svg {
   width: 16px;
   height: 16px;
+
   fill: none;
+
   stroke: currentColor;
+
   stroke-width: 2.2;
+
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+
+/* =========================================
+   PORCENTAJE
+   ========================================= */
+
 .zoom-pct {
   min-width: 56px;
+
   text-align: center;
+
   font-size: 0.85rem;
+
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+
+  font-variant-numeric:
+    tabular-nums;
 }
 
-/* Slider que se va llenando */
+
+/* =========================================
+   SLIDER
+   ========================================= */
+
 .zoom-slider {
-  -webkit-appearance: none;
   appearance: none;
+
   width: 190px;
   height: 8px;
+
   border-radius: 999px;
+
   outline: none;
+
   cursor: pointer;
-  background: linear-gradient(
-    90deg,
-    var(--accent-1) 0%,
-    var(--accent-2) var(--p, 50%),
-    rgba(255, 255, 255, 0.12) var(--p, 50%)
-  );
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent-1) 0%,
+      var(--accent-2) var(--p, 50%),
+      rgba(255, 255, 255, 0.12)
+      var(--p, 50%)
+    );
+
+  transition:
+    filter 0.2s ease;
 }
+
+
+.zoom-slider:hover {
+  filter:
+    brightness(1.15);
+}
+
 
 .zoom-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  appearance: none;
+
   width: 18px;
   height: 18px;
+
   border-radius: 50%;
+
   background: #fff;
-  border: 3px solid var(--accent-2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  transition: transform 0.15s;
+
+  border:
+    3px solid
+    var(--accent-2);
+
+  box-shadow:
+    0 2px 8px
+    rgba(0, 0, 0, 0.5);
 }
 
-.zoom-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
 .zoom-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
+
   border-radius: 50%;
+
   background: #fff;
-  border: 3px solid var(--accent-2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+
+  border:
+    3px solid
+    var(--accent-2);
 }
 
-.zoom-slider::-moz-range-track { background: transparent; }
 
-/* ---------- Minimapa ---------- */
+/* =========================================
+   MINIMAPA
+   ========================================= */
+
 .minimap {
   position: absolute;
+
   right: 22px;
   bottom: 22px;
+
   width: 220px;
+
   overflow: hidden;
+
   border-radius: 16px;
-  border: 1px solid var(--border);
-  background: var(--diagram-bg);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  border:
+    1px solid var(--border);
+
+  background:
+    var(--diagram-bg);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.45);
+
   cursor: pointer;
+
   touch-action: none;
+
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
 }
+
+
+.minimap:hover {
+  border-color:
+    rgba(99, 102, 241, 0.35);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.45),
+
+    0 0 15px
+    rgba(99, 102, 241, 0.08);
+}
+
 
 .minimap img {
   display: block;
+
   width: 100%;
   height: 100%;
+
   pointer-events: none;
 }
+
+
+/* =========================================
+   RECUADRO DEL MINIMAPA
+   ========================================= */
 
 .mini-view {
   position: absolute;
-  border: 2px solid var(--accent-1);
-  background: rgba(99, 102, 241, 0.18);
+
+  left: 0;
+  top: 0;
+
+  width: 0;
+  height: 0;
+
+  border:
+    2px solid var(--accent-1);
+
+  background:
+    rgba(99, 102, 241, 0.18);
+
   border-radius: 6px;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+
+  box-shadow:
+    0 0 12px
+    rgba(99, 102, 241, 0.6);
+
   pointer-events: none;
+
+  z-index: 5;
+
+  transition:
+    left 0.08s linear,
+    top 0.08s linear,
+    width 0.08s linear,
+    height 0.08s linear;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 720px) {
-  .hint { display: none; }
-  .minimap { width: 130px; right: 12px; bottom: 80px; border-radius: 12px; }
-  .zoombar { bottom: 14px; gap: 6px; padding: 8px 10px; }
-  .zoom-slider { width: 110px; }
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 850px) {
+
+  .brand {
+    min-width: auto;
+  }
+
+  .hint {
+    display: none;
+  }
 }
 
-/* Fuerza el SVG a un solo esquema de color, sin importar el modo del dispositivo */
-.stage img,
-.minimap img {
-  color-scheme: dark;
+
+@media (max-width: 600px) {
+
+  .brand h1 {
+    display: none;
+  }
+
+
+  .diagram-selector {
+    position: static;
+
+    transform: none;
+
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
+
+  .diagram-option {
+    padding:
+      6px 8px;
+
+    font-size:
+      0.65rem;
+  }
+
+
+  .minimap {
+    width: 140px;
+
+    right: 12px;
+    bottom: 80px;
+
+    border-radius: 12px;
+  }
+
+
+  .zoombar {
+    bottom: 14px;
+
+    gap: 6px;
+
+    padding:
+      8px 10px;
+  }
+
+
+  .zoom-slider {
+    width: 110px;
+  }
 }

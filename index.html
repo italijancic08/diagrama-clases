@@ -1,61 +1,259 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diagrama de Clases</title>
+
+  <title>Diagramas UML</title>
+
   <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
+  <!-- HEADER -->
   <header class="topbar">
+
     <div class="brand">
+
       <span class="logo"></span>
-      <h1>Diagrama de Clases</h1>
-      <span class="badge">UML</span>
+
+      <h1 id="pageTitle">
+        Diagrama de Clases
+      </h1>
+
+      <span class="badge">
+        UML
+      </span>
+
     </div>
-    <p class="hint">Rueda para hacer zoom · Arrastrá para moverte · Doble clic para acercar</p>
+
+
+    <!-- SELECTOR -->
+    <div class="diagram-selector">
+
+      <button
+        class="diagram-option active"
+        onclick="cambiarDiagrama(
+          'img/diagrama de clases.svg',
+          'Diagrama de Clases',
+          this
+        )"
+      >
+        Clases
+      </button>
+
+
+      <button
+        class="diagram-option"
+        onclick="cambiarDiagrama(
+          'img/diagrama de secuencia.svg',
+          'Diagrama de Secuencia',
+          this
+        )"
+      >
+        Secuencia
+      </button>
+
+
+      <button
+        class="diagram-option"
+        onclick="cambiarDiagrama(
+          'img/casos de uso.svg',
+          'Diagrama de Casos de Uso',
+          this
+        )"
+      >
+        Casos de uso
+      </button>
+
+    </div>
+
+
+    <p class="hint">
+      Rueda para hacer zoom · Arrastrá para moverte · Doble clic para acercar
+    </p>
+
   </header>
 
-  <main id="viewer" class="viewer">
 
-    <div id="stage" class="stage">
-      <img id="diagram" src="img/diagrama de clases.svg" alt="Diagrama de clases" draggable="false">
+  <!-- VISOR -->
+  <main
+    id="viewer"
+    class="viewer"
+  >
+
+    <!-- DIAGRAMA -->
+    <div
+      id="stage"
+      class="stage"
+    >
+
+      <img
+        id="diagram"
+        src="img/diagrama de clases.svg"
+        alt="Diagrama de clases"
+        draggable="false"
+      >
+
     </div>
 
-    <!-- Mensaje de error si no carga el SVG -->
-    <div id="errorMsg" class="error-msg" hidden>
-      No se pudo cargar <strong>img/diagrama_de_clases.svg</strong>.<br>
-      Revisá que el archivo exista y que el nombre esté escrito exactamente igual.
+
+    <!-- MENSAJE DE ERROR -->
+    <div
+      id="errorMsg"
+      class="error-msg"
+      hidden
+    >
+
+      No se pudo cargar el diagrama.
+
+      <br>
+
+      Archivo inexistente
+
     </div>
 
-    <!-- Barra de zoom -->
+
+    <!-- BARRA DE ZOOM -->
     <div class="zoombar">
-      <button id="btnOut" class="icon-btn" title="Alejar (-)" aria-label="Alejar">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+
+      <button
+        id="btnOut"
+        class="icon-btn"
+        title="Alejar (-)"
+        aria-label="Alejar"
+      >
+
+        <svg viewBox="0 0 24 24">
+          <path d="M5 12h14"/>
+        </svg>
+
       </button>
 
-      <input id="zoomSlider" class="zoom-slider" type="range" min="0" max="1000" value="500" aria-label="Nivel de zoom">
 
-      <button id="btnIn" class="icon-btn" title="Acercar (+)" aria-label="Acercar">
-        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      <input
+        id="zoomSlider"
+        class="zoom-slider"
+        type="range"
+        min="0"
+        max="1000"
+        value="500"
+        aria-label="Nivel de zoom"
+      >
+
+
+      <button
+        id="btnIn"
+        class="icon-btn"
+        title="Acercar (+)"
+        aria-label="Acercar"
+      >
+
+        <svg viewBox="0 0 24 24">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+
       </button>
 
-      <span id="zoomPct" class="zoom-pct">100%</span>
 
-      <button id="btnFit" class="icon-btn" title="Ajustar a pantalla (0)" aria-label="Ajustar a pantalla">
-        <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      <span
+        id="zoomPct"
+        class="zoom-pct"
+      >
+        100%
+      </span>
+
+
+      <button
+        id="btnFit"
+        class="icon-btn"
+        title="Ajustar a pantalla (0)"
+        aria-label="Ajustar a pantalla"
+      >
+
+        <svg viewBox="0 0 24 24">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+        </svg>
+
       </button>
+
     </div>
 
-    <!-- Minimapa -->
-    <div id="minimap" class="minimap" title="Minimapa">
-      <img id="miniImg" alt="" draggable="false">
-      <div id="miniView" class="mini-view"></div>
+
+    <!-- MINIMAPA -->
+    <div
+      id="minimap"
+      class="minimap"
+      title="Minimapa"
+    >
+
+      <img
+        id="miniImg"
+        alt=""
+        draggable="false"
+      >
+
+      <!-- RECUADRO DE POSICIÓN -->
+      <div class="mini-view"></div>
+
     </div>
 
   </main>
 
+
+  <!-- CAMBIO DE DIAGRAMAS -->
+  <script>
+  function cambiarDiagrama(ruta, titulo, elemento) {
+
+    const diagram = document.getElementById("diagram");
+    const pageTitle = document.getElementById("pageTitle");
+    const stage = document.getElementById("stage");
+
+    // Si ya estamos viendo este diagrama, no hacemos nada
+    if (diagram.getAttribute("src") === ruta) {
+      return;
+    }
+
+    // Animación de salida
+    stage.classList.add("diagram-changing");
+
+    // Cambiar título
+    pageTitle.textContent = titulo;
+
+    // Cambiar botón activo
+    document
+      .querySelectorAll(".diagram-option")
+      .forEach(function(opcion) {
+        opcion.classList.remove("active");
+      });
+
+    elemento.classList.add("active");
+
+    // Esperar un poco antes de cambiar la imagen
+    setTimeout(function() {
+
+      diagram.onload = function() {
+
+        // Esperar al siguiente frame para hacer el fade-in
+        requestAnimationFrame(function() {
+          stage.classList.remove("diagram-changing");
+        });
+
+      };
+
+      diagram.src = ruta;
+      diagram.alt = titulo;
+
+    }, 120);
+  }
+</script>
+
+
+  <!-- APP -->
   <script src="js/app.js"></script>
+
 </body>
+
 </html>
