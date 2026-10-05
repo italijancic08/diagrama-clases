@@ -1,0 +1,256 @@
+:root {
+  --bg: #0b0f1a;
+  --panel: rgba(17, 24, 39, 0.72);
+  --border: rgba(255, 255, 255, 0.10);
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --accent-1: #6366f1;
+  --accent-2: #22d3ee;
+  --header-h: 56px;
+
+  /* Fondo detrás del diagrama (por si el SVG es transparente).
+     Si tu diagrama se ve mejor sobre oscuro, probá con #111827 */
+  --diagram-bg: #0b0f1a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Encabezado ---------- */
+.topbar {
+  height: var(--header-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(11, 15, 26, 0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.logo {
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.7);
+}
+
+.brand h1 { font-size: 1rem; font-weight: 600; letter-spacing: 0.2px; }
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--accent-2);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.hint { font-size: 0.8rem; color: var(--muted); }
+
+/* ---------- Visor ---------- */
+.viewer {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+
+.viewer.dragging { cursor: grabbing; }
+
+/* Importante: sin "will-change", así el navegador vuelve a dibujar el SVG
+   nítido en cada nivel de zoom */
+.stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.stage.smooth { transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); }
+
+.stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--diagram-bg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+  pointer-events: none;
+}
+
+/* ---------- Mensaje de error ---------- */
+.error-msg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 420px;
+  padding: 22px 26px;
+  text-align: center;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  border-radius: 16px;
+  backdrop-filter: blur(14px);
+}
+
+.error-msg[hidden] { display: none; }
+
+/* ---------- Barra de zoom ---------- */
+.zoombar {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  cursor: default;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.icon-btn:hover { background: rgba(99, 102, 241, 0.35); }
+.icon-btn:active { transform: scale(0.92); }
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zoom-pct {
+  min-width: 56px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slider que se va llenando */
+.zoom-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 190px;
+  height: 8px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    90deg,
+    var(--accent-1) 0%,
+    var(--accent-2) var(--p, 50%),
+    rgba(255, 255, 255, 0.12) var(--p, 50%)
+  );
+}
+
+.zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s;
+}
+
+.zoom-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+.zoom-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.zoom-slider::-moz-range-track { background: transparent; }
+
+/* ---------- Minimapa ---------- */
+.minimap {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  width: 220px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--diagram-bg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.minimap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mini-view {
+  position: absolute;
+  border: 2px solid var(--accent-1);
+  background: rgba(99, 102, 241, 0.18);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+  pointer-events: none;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .hint { display: none; }
+  .minimap { width: 130px; right: 12px; bottom: 80px; border-radius: 12px; }
+  .zoombar { bottom: 14px; gap: 6px; padding: 8px 10px; }
+  .zoom-slider { width: 110px; }
+}
