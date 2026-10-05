@@ -854,4 +854,15 @@ body {
   .zoom-slider {
     width: 110px;
   }
+    .viewer {
+    background-color: #0b0f1a;
+  }
+
+  .stage {
+    background-color: #0b0f1a;
+  }
+
+  .stage img {
+    background-color: #0b0f1a;
+  }
 }
