@@ -258,5 +258,5 @@ body {
 /* Fuerza el SVG a un solo esquema de color, sin importar el modo del dispositivo */
 .stage img,
 .minimap img {
-  color-scheme: light;
+  color-scheme: light dark;
 }
