@@ -377,17 +377,6 @@ body {
   transform-origin:
     0 0;
 
-  /*
-   * NO usamos:
-   *
-   * will-change: transform;
-   * backface-visibility;
-   * translate3d;
-   *
-   * porque pueden provocar que Chrome
-   * rasterice el SVG y se vea pixelado.
-   */
-
   opacity: 1;
 
   transition:
@@ -397,10 +386,6 @@ body {
 
 /*
  * Animación para cambiar de diagrama.
- *
- * Importante:
- * solamente animamos opacity.
- * No tocamos transform.
  */
 
 .stage.diagram-changing {
@@ -436,7 +421,7 @@ body {
 
   border-radius: 10px;
 
-  background:
+  background-color:
     var(--diagram-bg);
 
   box-shadow:
@@ -447,11 +432,6 @@ body {
     var(--border);
 
   pointer-events: none;
-
-  /*
-   * Dejamos el renderizado normal del navegador.
-   * No usamos image-rendering: pixelated.
-   */
 }
 
 
@@ -748,6 +728,9 @@ body {
 
   object-fit: contain;
 
+  background-color:
+    var(--diagram-bg);
+
   pointer-events: none;
 }
 
@@ -854,15 +837,28 @@ body {
   .zoom-slider {
     width: 110px;
   }
-    .viewer {
-    background-color: #0b0f1a;
+
+
+  /*
+   * Safari / iPhone:
+   * forzamos el mismo fondo oscuro
+   * en todos los elementos que contienen
+   * el SVG.
+   */
+
+  .viewer,
+  .stage,
+  .stage img,
+  .minimap,
+  .minimap img {
+    background-color:
+      #0b0f1a !important;
   }
 
-  .stage {
-    background-color: #0b0f1a;
-  }
 
-  .stage img {
-    background-color: #0b0f1a;
+  .stage img,
+  .minimap img {
+    background-image:
+      none !important;
   }
 }
