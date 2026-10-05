@@ -254,3 +254,9 @@ body {
   .zoombar { bottom: 14px; gap: 6px; padding: 8px 10px; }
   .zoom-slider { width: 110px; }
 }
+
+/* Fuerza el SVG a un solo esquema de color, sin importar el modo del dispositivo */
+.stage img,
+.minimap img {
+  color-scheme: light;
+}
