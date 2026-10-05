@@ -53,6 +53,11 @@
 
   const FALLBACK_H = 1243;
 
+  /* Tamaño máximo permitido del minimapa */
+  const MINIMAP_MAX_W = 220;
+
+  const MINIMAP_MAX_H = 180;
+
 
   /* =========================================
      VARIABLES
@@ -120,20 +125,16 @@
         ? img.naturalWidth
         : FALLBACK_W;
 
-
     ih =
       img.naturalHeight > 0
         ? img.naturalHeight
         : FALLBACK_H;
 
-
     stage.style.width =
       iw + 'px';
 
-
     stage.style.height =
       ih + 'px';
-
 
     /*
      * Actualizar imagen del minimapa.
@@ -142,17 +143,13 @@
     miniImg.src =
       img.src;
 
-
     errorMsg.hidden =
       true;
-
 
     minimap.style.display =
       '';
 
-
     sizeMinimap();
-
 
     /*
      * Ajustar nuevo diagrama
@@ -173,13 +170,33 @@
       return;
     }
 
+    /*
+     * El minimapa debe conservar exactamente
+     * la misma relación de aspecto que el
+     * diagrama original.
+     *
+     * Nunca puede superar:
+     *
+     * 220 px de ancho
+     * 180 px de alto
+     */
+
+    const ratio = Math.min(
+      MINIMAP_MAX_W / iw,
+      MINIMAP_MAX_H / ih
+    );
+
+    const miniW =
+      iw * ratio;
+
+    const miniH =
+      ih * ratio;
+
+    minimap.style.width =
+      miniW + 'px';
 
     minimap.style.height =
-      (
-        minimap.clientWidth *
-        ih /
-        iw
-      ) + 'px';
+      miniH + 'px';
   }
 
 
@@ -193,14 +210,11 @@
       return;
     }
 
-
     fitScale =
       computeFit();
 
-
     scale =
       fitScale;
-
 
     x =
       (
@@ -208,13 +222,11 @@
         iw * scale
       ) / 2;
 
-
     y =
       (
         viewer.clientHeight -
         ih * scale
       ) / 2;
-
 
     apply(animate);
   }
@@ -230,9 +242,7 @@
       return;
     }
 
-
     renderPending = true;
-
 
     requestAnimationFrame(() => {
 
@@ -254,13 +264,11 @@
       return;
     }
 
-
     const vw =
       viewer.clientWidth;
 
     const vh =
       viewer.clientHeight;
-
 
     /*
      * Limitar movimiento horizontal.
@@ -273,7 +281,6 @@
         vw - MARGIN
       );
 
-
     /*
      * Limitar movimiento vertical.
      */
@@ -284,7 +291,6 @@
         MARGIN - ih * scale,
         vh - MARGIN
       );
-
 
     /*
      * Animación solamente cuando
@@ -297,11 +303,9 @@
         'smooth'
       );
 
-
       clearTimeout(
         smoothTimer
       );
-
 
       smoothTimer =
         setTimeout(() => {
@@ -312,7 +316,6 @@
 
         }, 300);
     }
-
 
     /*
      * IMPORTANTE:
@@ -327,9 +330,8 @@
      * permanente del SVG.
      */
 
-stage.style.transform =
-  `translate(${Math.round(x)}px, ${Math.round(y)}px) scale(${scale})`;
-
+    stage.style.transform =
+      `translate(${Math.round(x)}px, ${Math.round(y)}px) scale(${scale})`;
 
     updateUI();
   }
@@ -345,7 +347,6 @@ stage.style.transform =
       return;
     }
 
-
     /*
      * Zoom.
      */
@@ -353,10 +354,8 @@ stage.style.transform =
     const rel =
       scale / fitScale;
 
-
     pct.textContent =
       Math.round(rel * 100) + '%';
-
 
     /*
      * Slider.
@@ -370,10 +369,8 @@ stage.style.transform =
         1
       );
 
-
     slider.value =
       t * 1000;
-
 
     slider.style.setProperty(
       '--p',
@@ -387,29 +384,45 @@ stage.style.transform =
      * =========================
      */
 
-    const k =
-      minimap.clientWidth / iw;
+    const miniW =
+      minimap.clientWidth;
 
+    const miniH =
+      minimap.clientHeight;
+
+    if (!miniW || !miniH) {
+      return;
+    }
+
+    /*
+     * Escala real del minimapa.
+     *
+     * Como el minimapa conserva la proporción
+     * del diagrama, ambas escalas deberían ser
+     * iguales.
+     */
+
+    const k = Math.min(
+      miniW / iw,
+      miniH / ih
+    );
 
     if (!k) {
       return;
     }
 
-
     /*
-     * Posición visible.
+     * Posición visible dentro del diagrama.
      */
 
     const viewLeft =
       (-x / scale) * k;
 
-
     const viewTop =
       (-y / scale) * k;
 
-
     /*
-     * Tamaño visible.
+     * Tamaño de la zona visible.
      */
 
     const viewWidth =
@@ -418,32 +431,65 @@ stage.style.transform =
         scale
       ) * k;
 
-
     const viewHeight =
       (
         viewer.clientHeight /
         scale
       ) * k;
 
-
     /*
-     * Aplicar recuadro.
+     * El recuadro nunca puede ser más grande
+     * que el propio minimapa.
      */
 
-    miniView.style.left =
-      viewLeft + 'px';
+    const safeWidth =
+      Math.min(
+        viewWidth,
+        miniW
+      );
 
+    const safeHeight =
+      Math.min(
+        viewHeight,
+        miniH
+      );
+
+    /*
+     * Evitar que el indicador salga por
+     * cualquiera de los cuatro lados.
+     */
+
+    const safeLeft =
+      clamp(
+        viewLeft,
+        0,
+        Math.max(
+          0,
+          miniW - safeWidth
+        )
+      );
+
+    const safeTop =
+      clamp(
+        viewTop,
+        0,
+        Math.max(
+          0,
+          miniH - safeHeight
+        )
+      );
+
+    miniView.style.left =
+      safeLeft + 'px';
 
     miniView.style.top =
-      viewTop + 'px';
-
+      safeTop + 'px';
 
     miniView.style.width =
-      viewWidth + 'px';
-
+      safeWidth + 'px';
 
     miniView.style.height =
-      viewHeight + 'px';
+      safeHeight + 'px';
   }
 
 
@@ -465,24 +511,19 @@ stage.style.transform =
         fitScale * MAX_REL
       );
 
-
     const r =
       newScale / scale;
-
 
     x =
       cx -
       (cx - x) * r;
 
-
     y =
       cy -
       (cy - y) * r;
 
-
     scale =
       newScale;
-
 
     if (animate) {
 
@@ -518,26 +559,21 @@ stage.style.transform =
 
       e.preventDefault();
 
-
       const rect =
         viewer.getBoundingClientRect();
 
-
       let delta =
         e.deltaY;
-
 
       if (e.deltaMode === 1) {
 
         delta *= 33;
       }
 
-
       const speed =
         e.ctrlKey
           ? 0.01
           : 0.0015;
-
 
       zoomAt(
         scale *
@@ -564,9 +600,7 @@ stage.style.transform =
   const pointers =
     new Map();
 
-
   let lastDist = 0;
-
 
   viewer.addEventListener(
     'pointerdown',
@@ -580,11 +614,9 @@ stage.style.transform =
         return;
       }
 
-
       viewer.setPointerCapture(
         e.pointerId
       );
-
 
       pointers.set(
         e.pointerId,
@@ -594,11 +626,9 @@ stage.style.transform =
         }
       );
 
-
       viewer.classList.add(
         'dragging'
       );
-
 
       /*
        * Si hay dos dedos,
@@ -609,7 +639,6 @@ stage.style.transform =
 
         const [a, b] =
           [...pointers.values()];
-
 
         lastDist =
           Math.hypot(
@@ -633,12 +662,10 @@ stage.style.transform =
         return;
       }
 
-
       const prev =
         pointers.get(
           e.pointerId
         );
-
 
       const cur = {
 
@@ -658,16 +685,13 @@ stage.style.transform =
         x +=
           cur.x - prev.x;
 
-
         y +=
           cur.y - prev.y;
-
 
         pointers.set(
           e.pointerId,
           cur
         );
-
 
         /*
          * En vez de aplicar inmediatamente,
@@ -675,7 +699,6 @@ stage.style.transform =
          */
 
         requestRender();
-
 
       }
 
@@ -693,10 +716,8 @@ stage.style.transform =
           cur
         );
 
-
         const [a, b] =
           [...pointers.values()];
-
 
         const dist =
           Math.hypot(
@@ -704,10 +725,8 @@ stage.style.transform =
             a.y - b.y
           );
 
-
         const rect =
           viewer.getBoundingClientRect();
-
 
         const mx =
           (
@@ -715,13 +734,11 @@ stage.style.transform =
           ) / 2 -
           rect.left;
 
-
         const my =
           (
             a.y + b.y
           ) / 2 -
           rect.top;
-
 
         if (lastDist) {
 
@@ -735,7 +752,6 @@ stage.style.transform =
             my
           );
         }
-
 
         lastDist =
           dist;
@@ -754,12 +770,10 @@ stage.style.transform =
       e.pointerId
     );
 
-
     if (pointers.size < 2) {
 
       lastDist = 0;
     }
-
 
     if (pointers.size === 0) {
 
@@ -798,10 +812,8 @@ stage.style.transform =
         return;
       }
 
-
       const rect =
         viewer.getBoundingClientRect();
-
 
       zoomAt(
         scale * 1.8,
@@ -830,7 +842,6 @@ stage.style.transform =
           MAX_REL / MIN_REL,
           slider.value / 1000
         );
-
 
       zoomAt(
         fitScale * rel,
@@ -910,7 +921,6 @@ stage.style.transform =
         return;
       }
 
-
       if (
         e.key === '+' ||
         e.key === '='
@@ -926,7 +936,6 @@ stage.style.transform =
           true
         );
 
-
       } else if (
         e.key === '-'
       ) {
@@ -940,7 +949,6 @@ stage.style.transform =
 
           true
         );
-
 
       } else if (
         e.key === '0'
@@ -966,38 +974,47 @@ stage.style.transform =
       return;
     }
 
-
     const rect =
       minimap.getBoundingClientRect();
 
+    if (!rect.width || !rect.height) {
+      return;
+    }
 
-    const k =
+    /*
+     * X e Y se calculan por separado.
+     *
+     * Esto evita errores con diagramas
+     * extremadamente altos o anchos.
+     */
+
+    const scaleX =
       iw / rect.width;
 
+    const scaleY =
+      ih / rect.height;
 
     const ix =
-      (
-        e.clientX -
-        rect.left
-      ) * k;
-
+      clamp(
+        e.clientX - rect.left,
+        0,
+        rect.width
+      ) * scaleX;
 
     const iy =
-      (
-        e.clientY -
-        rect.top
-      ) * k;
-
+      clamp(
+        e.clientY - rect.top,
+        0,
+        rect.height
+      ) * scaleY;
 
     x =
       centerX() -
       ix * scale;
 
-
     y =
       centerY() -
       iy * scale;
-
 
     requestRender();
   }
@@ -1011,15 +1028,12 @@ stage.style.transform =
         return;
       }
 
-
       miniDrag =
         true;
-
 
       minimap.setPointerCapture(
         e.pointerId
       );
-
 
       miniMove(e);
     }
@@ -1070,21 +1084,16 @@ stage.style.transform =
         return;
       }
 
-
       const old =
         fitScale;
-
 
       fitScale =
         computeFit();
 
-
       scale *=
         fitScale / old;
 
-
       sizeMinimap();
-
 
       apply();
     }
@@ -1101,7 +1110,6 @@ stage.style.transform =
 
       errorMsg.hidden =
         false;
-
 
       minimap.style.display =
         'none';

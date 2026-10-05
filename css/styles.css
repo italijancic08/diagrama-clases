@@ -700,6 +700,7 @@ body {
   bottom: 22px;
 
   width: 220px;
+  height: 180px;
 
   overflow: hidden;
 
@@ -744,6 +745,8 @@ body {
 
   width: 100%;
   height: 100%;
+
+  object-fit: contain;
 
   pointer-events: none;
 }
